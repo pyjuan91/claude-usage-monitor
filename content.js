@@ -234,10 +234,20 @@
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
+  // ── Sidebar detection ───────────────────────────────────────────
+  function getSidebarInfo() {
+    const nav = document.querySelector('nav[aria-label="Sidebar"]');
+    if (!nav) return { element: null, width: 0, isOpen: false };
+    const rect = nav.getBoundingClientRect();
+    const isOpen = rect.right > 0 && rect.width > 0;
+    return { element: nav, width: isOpen ? rect.right : 0, isOpen };
+  }
+
   // ── Widget ────────────────────────────────────────────────────────
   let widgetHost = null;
   let shadowRoot = null;
   let isCollapsed = false;
+  let isForceCollapsed = false;
   let countdownInterval = null;
 
   function getUtilColor(pct, dark) {
@@ -262,6 +272,19 @@
     const dark = isDarkMode();
     const data = lastUsageData;
 
+    const sidebarWidth = getSidebarInfo().width;
+    const leftPos = sidebarWidth + 8;
+    const availableWidth = window.innerWidth - sidebarWidth;
+
+    // Auto-collapse on narrow viewport
+    if (availableWidth < 600) {
+      isForceCollapsed = true;
+    } else {
+      isForceCollapsed = false;
+    }
+
+    const effectiveCollapsed = isCollapsed || isForceCollapsed;
+
     const bgColor = dark ? '#333333' : '#FFFFFF';
     const borderColor = dark ? '#444444' : '#E8E5DE';
     const textPrimary = dark ? '#ECECEC' : '#1F1E1D';
@@ -279,7 +302,7 @@
       .widget-expanded {
         position: fixed;
         bottom: 16px;
-        left: 16px;
+        left: ${leftPos}px;
         z-index: 2147483647;
         background: ${bgColor};
         border: 1px solid ${borderColor};
@@ -291,14 +314,14 @@
         color: ${textPrimary};
         box-shadow: ${dark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.08)'};
         line-height: 1.4;
-        transition: opacity 0.2s;
+        transition: opacity 0.2s, left 0.2s ease;
       }
       .widget-expanded.hidden { display: none; }
 
       .sidebar-icon {
         position: fixed;
         bottom: 16px;
-        left: 16px;
+        left: ${leftPos}px;
         z-index: 2147483647;
         width: 36px;
         height: 36px;
@@ -310,7 +333,7 @@
         justify-content: center;
         cursor: pointer;
         box-shadow: ${dark ? '0 2px 6px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'};
-        transition: transform 0.15s;
+        transition: transform 0.15s, left 0.2s ease;
       }
       .sidebar-icon:hover { transform: scale(1.08); }
       .sidebar-icon.hidden { display: none; }
@@ -318,7 +341,7 @@
       .tooltip {
         position: fixed;
         bottom: 58px;
-        left: 16px;
+        left: ${leftPos}px;
         z-index: 2147483647;
         background: ${bgColor};
         border: 1px solid ${borderColor};
@@ -441,7 +464,7 @@
     </style>`;
 
     // ── Expanded widget ──
-    html += `<div class="widget-expanded${isCollapsed ? ' hidden' : ''}" id="expanded">`;
+    html += `<div class="widget-expanded${effectiveCollapsed ? ' hidden' : ''}" id="expanded">`;
 
     if (!data && !fetchError) {
       // Loading
@@ -465,7 +488,7 @@
     html += `</div>`;
 
     // ── Collapsed sidebar icon ──
-    html += `<div class="sidebar-icon${isCollapsed ? '' : ' hidden'}" id="sidebar-icon">
+    html += `<div class="sidebar-icon${effectiveCollapsed ? '' : ' hidden'}" id="sidebar-icon">
       ${buildDonutIcon(data, accent, trackColor)}
     </div>`;
 
@@ -492,9 +515,11 @@
     });
 
     sidebarIcon?.addEventListener('click', () => {
-      isCollapsed = false;
-      storage.set(STORAGE_KEY_COLLAPSED, false);
-      renderWidget();
+      if (!isForceCollapsed) {
+        isCollapsed = false;
+        storage.set(STORAGE_KEY_COLLAPSED, false);
+        renderWidget();
+      }
     });
 
     sidebarIcon?.addEventListener('mouseenter', () => {
@@ -676,6 +701,29 @@
     }
   });
 
+  // ── Sidebar observers ────────────────────────────────────────────
+  let sidebarObserversAttached = false;
+
+  function observeSidebar() {
+    if (sidebarObserversAttached) return;
+    const { element } = getSidebarInfo();
+    if (element) {
+      sidebarObserversAttached = true;
+      new ResizeObserver(() => renderWidget()).observe(element);
+      new MutationObserver(() => renderWidget())
+        .observe(element, { attributes: true, attributeFilter: ['style', 'class'] });
+    } else {
+      setTimeout(observeSidebar, 1000);
+    }
+  }
+
+  // Debounced resize handler
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => renderWidget(), 100);
+  });
+
   // ── Init ──────────────────────────────────────────────────────────
   async function init() {
     // Restore collapsed state
@@ -684,6 +732,7 @@
 
     buildWidget();
     observeTheme();
+    observeSidebar();
     startCountdown();
     startPolling();
 
