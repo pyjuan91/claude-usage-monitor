@@ -261,10 +261,21 @@
 
     widgetHost = document.createElement('div');
     widgetHost.id = `${PREFIX}-host`;
+    widgetHost.style.cssText = 'position: fixed; top: 0; left: 0; width: 0; height: 0; z-index: 2147483647; pointer-events: none;';
     shadowRoot = widgetHost.attachShadow({ mode: 'closed' });
     document.body.appendChild(widgetHost);
 
     renderWidget();
+  }
+
+  let renderScheduled = false;
+  function scheduleRender() {
+    if (renderScheduled) return;
+    renderScheduled = true;
+    requestAnimationFrame(() => {
+      renderScheduled = false;
+      renderWidget();
+    });
   }
 
   function renderWidget() {
@@ -315,46 +326,9 @@
         box-shadow: ${dark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.08)'};
         line-height: 1.4;
         transition: opacity 0.2s, left 0.2s ease;
+        pointer-events: auto;
       }
       .widget-expanded.hidden { display: none; }
-
-      .sidebar-icon {
-        position: fixed;
-        bottom: 16px;
-        left: ${leftPos}px;
-        z-index: 2147483647;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: ${bgColor};
-        border: 1px solid ${borderColor};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: ${dark ? '0 2px 6px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'};
-        transition: transform 0.15s, left 0.2s ease;
-      }
-      .sidebar-icon:hover { transform: scale(1.08); }
-      .sidebar-icon.hidden { display: none; }
-
-      .tooltip {
-        position: fixed;
-        bottom: 58px;
-        left: ${leftPos}px;
-        z-index: 2147483647;
-        background: ${bgColor};
-        border: 1px solid ${borderColor};
-        border-radius: 10px;
-        padding: 12px 14px;
-        width: 260px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-        font-size: 12px;
-        color: ${textPrimary};
-        box-shadow: ${dark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.12)'};
-        display: none;
-        line-height: 1.4;
-      }
 
       .row { margin-bottom: 10px; }
       .row:last-of-type { margin-bottom: 6px; }
@@ -487,47 +461,20 @@
     </div>`;
     html += `</div>`;
 
-    // ── Collapsed sidebar icon ──
-    html += `<div class="sidebar-icon${effectiveCollapsed ? '' : ' hidden'}" id="sidebar-icon">
-      ${buildDonutIcon(data, accent, trackColor)}
-    </div>`;
-
-    // ── Tooltip (shown on hover of sidebar icon) ──
-    html += `<div class="tooltip" id="tooltip">`;
-    if (data) {
-      html += buildUsageRows(data, textSecondary, trackColor, dark);
-    } else {
-      html += `<div class="error-msg">${getErrorMessage()}</div>`;
-    }
-    html += `</div>`;
-
     shadowRoot.innerHTML = html;
 
     // ── Event listeners ──
     const btnCollapse = shadowRoot.getElementById('btn-collapse');
-    const sidebarIcon = shadowRoot.getElementById('sidebar-icon');
-    const tooltip = shadowRoot.getElementById('tooltip');
 
     btnCollapse?.addEventListener('click', () => {
       isCollapsed = true;
       storage.set(STORAGE_KEY_COLLAPSED, true);
       renderWidget();
+      renderSidebarToggle();
     });
 
-    sidebarIcon?.addEventListener('click', () => {
-      if (!isForceCollapsed) {
-        isCollapsed = false;
-        storage.set(STORAGE_KEY_COLLAPSED, false);
-        renderWidget();
-      }
-    });
-
-    sidebarIcon?.addEventListener('mouseenter', () => {
-      if (tooltip) tooltip.style.display = 'block';
-    });
-    sidebarIcon?.addEventListener('mouseleave', () => {
-      if (tooltip) tooltip.style.display = 'none';
-    });
+    // Update sidebar toggle icon state
+    renderSidebarToggle();
   }
 
   function buildUsageRows(data, textSecondary, trackColor, dark) {
@@ -623,6 +570,94 @@
     </svg>`;
   }
 
+  // ── Sidebar toggle button (injected into Claude's nav) ──────────
+  const SIDEBAR_TOGGLE_ID = `${PREFIX}-sidebar-toggle`;
+
+  function renderSidebarToggle() {
+    const { element: nav } = getSidebarInfo();
+    if (!nav) return;
+
+    const dark = isDarkMode();
+    const data = lastUsageData;
+    const pct = data?.five_hour?.utilization ?? 0;
+    const color = getUtilColor(pct, dark);
+    const textColor = dark ? '#ECECEC' : '#1F1E1D';
+    const hoverBg = dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+    const trackColor = dark ? '#444444' : '#E8E5DE';
+
+    const effectiveCollapsed = isCollapsed || isForceCollapsed;
+
+    // Donut SVG for the button
+    const radius = 8;
+    const circumference = 2 * Math.PI * radius;
+    const dashOffset = circumference - (pct / 100) * circumference;
+    const donutSvg = `<svg width="20" height="20" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="${radius}" fill="none" stroke="${trackColor}" stroke-width="2.5"/>
+      <circle cx="12" cy="12" r="${radius}" fill="none" stroke="${color}" stroke-width="2.5"
+        stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"
+        stroke-linecap="round" transform="rotate(-90 12 12)"/>
+      <text x="12" y="12.5" text-anchor="middle" dominant-baseline="middle"
+        font-size="7" font-weight="700" fill="${textColor}"
+        font-family="-apple-system, BlinkMacSystemFont, sans-serif">${Math.round(pct)}</text>
+    </svg>`;
+
+    let btn = document.getElementById(SIDEBAR_TOGGLE_ID);
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = SIDEBAR_TOGGLE_ID;
+      btn.title = 'Usage Monitor';
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isForceCollapsed) return;
+        isCollapsed = !isCollapsed;
+        storage.set(STORAGE_KEY_COLLAPSED, isCollapsed);
+        renderWidget();
+      });
+
+      // Find the bottom area of the sidebar (above account avatar)
+      // Claude's sidebar has a bottom section with the user avatar button
+      const bottomSection = nav.querySelector('[class*="bottom"]')
+        || nav.querySelector(':scope > div:last-child');
+      if (bottomSection) {
+        bottomSection.insertBefore(btn, bottomSection.firstChild);
+      } else {
+        nav.appendChild(btn);
+      }
+    }
+
+    // Update button styles and content each render
+    btn.innerHTML = donutSvg;
+    btn.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 40px;
+      padding: 8px;
+      margin: 0;
+      border: none;
+      background: ${effectiveCollapsed ? 'transparent' : hoverBg};
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s;
+      opacity: ${isForceCollapsed ? '0.5' : '1'};
+    `;
+
+    // Store current hoverBg on the element for hover handlers
+    btn._hoverBg = hoverBg;
+    if (!btn._hoverAttached) {
+      btn._hoverAttached = true;
+      btn.addEventListener('mouseenter', () => {
+        btn.style.background = btn._hoverBg;
+      });
+      btn.addEventListener('mouseleave', () => {
+        const eff = isCollapsed || isForceCollapsed;
+        btn.style.background = eff ? 'transparent' : btn._hoverBg;
+      });
+    }
+  }
+
   function getErrorMessage() {
     switch (fetchError) {
       case 'auth':
@@ -640,7 +675,7 @@
 
   // ── Theme observer ────────────────────────────────────────────────
   function observeTheme() {
-    const observer = new MutationObserver(() => renderWidget());
+    const observer = new MutationObserver(() => scheduleRender());
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class', 'data-theme']
@@ -652,7 +687,7 @@
       });
     }
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      renderWidget();
+      scheduleRender();
     });
   }
 
@@ -660,7 +695,7 @@
   function startCountdown() {
     if (countdownInterval) clearInterval(countdownInterval);
     countdownInterval = setInterval(() => {
-      if (lastUsageData) renderWidget();
+      if (lastUsageData) scheduleRender();
     }, 30_000); // Update every 30s for smoother countdown
   }
 
@@ -682,7 +717,7 @@
 
   async function poll() {
     await fetchUsage();
-    renderWidget();
+    scheduleRender();
   }
 
   // Visibility-based polling
@@ -694,10 +729,14 @@
     }
   });
 
-  // Handle SPA navigation — re-check widget presence
+  // Handle SPA navigation — re-check widget and sidebar toggle presence
   const navObserver = new MutationObserver(() => {
     if (!document.getElementById(`${PREFIX}-host`)) {
       buildWidget();
+    }
+    // Re-inject sidebar toggle if it was removed (e.g. sidebar re-mounted)
+    if (!document.getElementById(SIDEBAR_TOGGLE_ID)) {
+      renderSidebarToggle();
     }
   });
 
@@ -709,8 +748,8 @@
     const { element } = getSidebarInfo();
     if (element) {
       sidebarObserversAttached = true;
-      new ResizeObserver(() => renderWidget()).observe(element);
-      new MutationObserver(() => renderWidget())
+      new ResizeObserver(() => scheduleRender()).observe(element);
+      new MutationObserver(() => scheduleRender())
         .observe(element, { attributes: true, attributeFilter: ['style', 'class'] });
     } else {
       setTimeout(observeSidebar, 1000);
@@ -721,7 +760,7 @@
   let resizeTimer = null;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => renderWidget(), 100);
+    resizeTimer = setTimeout(() => scheduleRender(), 100);
   });
 
   // ── Init ──────────────────────────────────────────────────────────
