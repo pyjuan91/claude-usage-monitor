@@ -32,6 +32,10 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
+  "data_collection_permissions": {
+    "storage_synced": false,
+    "personal_data": false
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "claude-usage-monitor@extension",
