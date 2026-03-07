@@ -203,7 +203,7 @@
 
   // ── Sidebar detection ───────────────────────────────────────────
   function getSidebarInfo() {
-    const nav = document.querySelector('nav[aria-label="Sidebar"]');
+    const nav = document.querySelector('nav[aria-label]');
     if (!nav) return { element: null, width: 0, isOpen: false };
     const rect = nav.getBoundingClientRect();
     const isOpen = rect.right > 0 && rect.width > 0;
