@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude Usage Monitor",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Displays claude.ai usage limits as a floating widget on the chat page.",
   "permissions": ["storage"],
   "host_permissions": [

@@ -10,8 +10,10 @@
   const STORAGE_KEY_USAGE = 'claude_usage_data';
   const NOTIFICATION_KEY = 'claude_usage_notified_80';
   const STORAGE_KEY_WIDGET_BOTTOM = 'claude_usage_widget_bottom';
+  const STORAGE_KEY_TUTORIAL_VERSION = 'claude_usage_tutorial_version';
   const PREFIX = 'claude-usage';
   const WIDGET_BOUNDARY_PX = 16;
+  const TUTORIAL_TOTAL_STEPS = 4;
 
   // ── Storage helper (works with both chrome and browser APIs) ──────
   const storage = {
@@ -472,6 +474,10 @@
       storage.set(STORAGE_KEY_COLLAPSED, true);
       renderWidget();
       renderSidebarToggle();
+      // Tutorial: step 3 (collapse widget)
+      if (tutorialStep === 3) {
+        setTimeout(() => nextTutorialStep(), 350);
+      }
     });
 
     // ── Drag handling ──
@@ -511,6 +517,10 @@
         if (isDragging) {
           isDragging = false;
           storage.set(STORAGE_KEY_WIDGET_BOTTOM, widgetBottom);
+          // Tutorial: step 2 (drag widget)
+          if (tutorialStep === 2) {
+            setTimeout(() => nextTutorialStep(), 300);
+          }
         }
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
@@ -649,6 +659,12 @@
         isCollapsed = !isCollapsed;
         storage.set(STORAGE_KEY_COLLAPSED, isCollapsed);
         renderWidget();
+        // Tutorial: step 1 (open widget) or step 4 (toggle again)
+        if (tutorialStep === 1 && !isCollapsed) {
+          setTimeout(() => nextTutorialStep(), 350);
+        } else if (tutorialStep === 4 && !isCollapsed) {
+          setTimeout(() => nextTutorialStep(), 350);
+        }
       });
 
       // Find the bottom area of the sidebar (above account avatar)
@@ -832,6 +848,353 @@
     resizeTimer = setTimeout(() => scheduleRender(), 100);
   });
 
+  // ── Tutorial ────────────────────────────────────────────────────────
+  let tutorialHost = null;
+  let tutorialShadow = null;
+  let tutorialStep = 0; // 0 = not showing
+
+  function getExtensionVersion() {
+    try { return chrome.runtime.getManifest().version; } catch (_) { return '0'; }
+  }
+
+  async function shouldShowTutorial() {
+    const shown = await storage.get(STORAGE_KEY_TUTORIAL_VERSION);
+    return shown !== getExtensionVersion();
+  }
+
+  function finishTutorial() {
+    storage.set(STORAGE_KEY_TUTORIAL_VERSION, getExtensionVersion());
+    tutorialStep = 0;
+    if (tutorialHost) {
+      tutorialHost.remove();
+      tutorialHost = null;
+      tutorialShadow = null;
+    }
+  }
+
+  function startTutorial() {
+    tutorialStep = 1;
+    // Ensure widget starts collapsed so user can open it in step 1
+    isCollapsed = true;
+    storage.set(STORAGE_KEY_COLLAPSED, true);
+    renderWidget();
+    renderTutorial();
+  }
+
+  function nextTutorialStep() {
+    tutorialStep++;
+    if (tutorialStep > TUTORIAL_TOTAL_STEPS) {
+      finishTutorial();
+      showConfetti();
+      return;
+    }
+    renderTutorial();
+  }
+
+  function getTutorialTargetRect(step) {
+    if (step === 1 || step === 4) {
+      const btn = document.getElementById(SIDEBAR_TOGGLE_ID);
+      return btn ? btn.getBoundingClientRect() : null;
+    }
+    if (step === 2) {
+      const handle = shadowRoot?.getElementById('drag-handle');
+      return handle ? handle.getBoundingClientRect() : null;
+    }
+    if (step === 3) {
+      const btn = shadowRoot?.getElementById('btn-collapse');
+      return btn ? btn.getBoundingClientRect() : null;
+    }
+    return null;
+  }
+
+  function renderTutorial() {
+    if (tutorialStep === 0) return;
+
+    const dark = isDarkMode();
+    const targetRect = getTutorialTargetRect(tutorialStep);
+    if (!targetRect) {
+      setTimeout(() => renderTutorial(), 300);
+      return;
+    }
+
+    // Create host if needed
+    if (!tutorialHost) {
+      tutorialHost = document.createElement('div');
+      tutorialHost.id = `${PREFIX}-tutorial-host`;
+      // pointer-events: none so clicks pass through to real elements
+      tutorialHost.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2147483647; pointer-events: none;';
+      tutorialShadow = tutorialHost.attachShadow({ mode: 'closed' });
+      document.body.appendChild(tutorialHost);
+    }
+
+    const bgColor = dark ? '#2B2B2B' : '#FFFFFF';
+    const borderColor = dark ? '#444444' : '#E8E5DE';
+    const textPrimary = dark ? '#ECECEC' : '#1F1E1D';
+    const textSecondary = dark ? '#999999' : '#6F6F78';
+    const accent = dark ? '#D4835E' : '#C15F3C';
+    const overlayColor = dark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)';
+
+    // Spotlight rect with padding
+    const pad = 6;
+    const sx = targetRect.left - pad;
+    const sy = targetRect.top - pad;
+    const sw = targetRect.width + pad * 2;
+    const sh = targetRect.height + pad * 2;
+    const sr = 10;
+
+    // Tooltip positioning — clamped to viewport
+    let tooltipStyle = '';
+    let arrowStyle = '';
+    let arrowDir = '';
+    const tooltipH = tutorialStep === 2 ? 280 : 170;
+    const viewH = window.innerHeight;
+    const viewPad = 12;
+
+    if (tutorialStep === 1 || tutorialStep === 2 || tutorialStep === 4) {
+      const left = targetRect.right + 16;
+      const idealTop = targetRect.top + targetRect.height / 2 - tooltipH / 2;
+      const clampedTop = Math.max(viewPad, Math.min(viewH - tooltipH - viewPad, idealTop));
+      const arrowTop = targetRect.top + targetRect.height / 2 - clampedTop;
+      tooltipStyle = `left: ${left}px; top: ${clampedTop}px;`;
+      arrowDir = 'left';
+      arrowStyle = `left: -6px; top: ${arrowTop}px; transform: translateY(-50%) rotate(45deg);`;
+    } else if (tutorialStep === 3) {
+      const left = targetRect.left + targetRect.width / 2;
+      const top = targetRect.top - 16;
+      tooltipStyle = `left: ${left}px; top: ${top}px; transform: translate(-50%, -100%);`;
+      arrowDir = 'bottom';
+      arrowStyle = `bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg);`;
+    }
+
+    // Drag animation SVG for step 2
+    const dragAnimationSvg = tutorialStep === 2 ? `
+      <div class="drag-anim">
+        <svg width="40" height="64" viewBox="0 0 40 64" fill="none">
+          <g class="drag-hand">
+            <circle cx="20" cy="18" r="8" fill="${accent}" opacity="0.2"/>
+            <path d="M20 12 C20 12, 14 16, 14 22 C14 25, 16 26, 18 25 L18 18 C18 16, 22 16, 22 18 L22 25 C24 26, 26 25, 26 22 C26 16, 20 12, 20 12Z" fill="${accent}" opacity="0.7"/>
+            <circle cx="20" cy="18" r="3" fill="${bgColor}" opacity="0.9"/>
+          </g>
+          <line x1="20" y1="4" x2="20" y2="10" stroke="${textSecondary}" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+          <polyline points="16,6 20,2 24,6" fill="none" stroke="${textSecondary}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="20" y1="54" x2="20" y2="60" stroke="${textSecondary}" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+          <polyline points="16,58 20,62 24,58" fill="none" stroke="${textSecondary}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>` : '';
+
+    const stepTitle = UsageI18n.t(`tutorialStep${tutorialStep}Title`);
+    const stepDesc = UsageI18n.t(`tutorialStep${tutorialStep}Desc`);
+    const stepLabel = UsageI18n.t('tutorialStep', tutorialStep, TUTORIAL_TOTAL_STEPS);
+    const skipLabel = UsageI18n.t('tutorialSkip');
+
+    const html = `
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      :host { all: initial; }
+
+      .tutorial-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        z-index: 2147483647;
+        pointer-events: none;
+        animation: fadeIn 0.25s ease;
+      }
+
+      .tutorial-overlay svg.overlay-mask {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
+      }
+
+      .tooltip {
+        position: fixed;
+        ${tooltipStyle}
+        width: 260px;
+        background: ${bgColor};
+        border: 1px solid ${borderColor};
+        border-radius: 12px;
+        padding: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        box-shadow: ${dark ? '0 4px 24px rgba(0,0,0,0.4)' : '0 4px 24px rgba(0,0,0,0.12)'};
+        z-index: 2147483647;
+        pointer-events: auto;
+        animation: tooltipIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+      }
+
+      .tooltip-arrow {
+        position: absolute;
+        ${arrowStyle}
+        width: 12px; height: 12px;
+        background: ${bgColor};
+        border: 1px solid ${borderColor};
+        ${arrowDir === 'left' ? 'border-right: none; border-top: none;' : ''}
+        ${arrowDir === 'bottom' ? 'border-left: none; border-top: none;' : ''}
+      }
+
+      .tooltip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .step-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: ${accent};
+        letter-spacing: 0.3px;
+      }
+
+      .skip-btn {
+        font-size: 11px;
+        color: ${textSecondary};
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: inherit;
+        transition: color 0.15s;
+      }
+      .skip-btn:hover { color: ${textPrimary}; }
+
+      .tooltip-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: ${textPrimary};
+        margin-bottom: 6px;
+        line-height: 1.3;
+      }
+
+      .tooltip-desc {
+        font-size: 12px;
+        color: ${textSecondary};
+        line-height: 1.5;
+      }
+
+      .drag-anim {
+        display: flex;
+        justify-content: center;
+        margin: 4px 0 8px;
+      }
+      .drag-hand {
+        animation: dragUpDown 2s ease-in-out infinite;
+      }
+      @keyframes dragUpDown {
+        0%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-12px); }
+        70% { transform: translateY(12px); }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes tooltipIn {
+        from { opacity: 0; transform: ${tooltipStyle.includes('translate(-50%, -100%)') ? 'translate(-50%, -100%) scale(0.95)' : 'scale(0.95)'}; }
+        to { opacity: 1; transform: ${tooltipStyle.includes('translate(-50%, -100%)') ? 'translate(-50%, -100%) scale(1)' : 'scale(1)'}; }
+      }
+
+      .spotlight-ring {
+        animation: pulseRing 2s ease-in-out infinite;
+      }
+      @keyframes pulseRing {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+    </style>
+
+    <div class="tutorial-overlay" id="tutorial-overlay">
+      <svg class="overlay-mask" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <mask id="spotlight-mask">
+            <rect width="100%" height="100%" fill="white"/>
+            <rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="${sr}" fill="black"/>
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill="${overlayColor}" mask="url(#spotlight-mask)"/>
+        <rect class="spotlight-ring" x="${sx - 2}" y="${sy - 2}" width="${sw + 4}" height="${sh + 4}" rx="${sr + 2}"
+          fill="none" stroke="${accent}" stroke-width="2"/>
+      </svg>
+
+      <div class="tooltip">
+        <div class="tooltip-arrow"></div>
+        <div class="tooltip-header">
+          <span class="step-label">${stepLabel}</span>
+          <button class="skip-btn" id="tutorial-skip">${skipLabel}</button>
+        </div>
+        <div class="tooltip-title">${stepTitle}</div>
+        ${dragAnimationSvg}
+        <div class="tooltip-desc">${stepDesc}</div>
+      </div>
+    </div>`;
+
+    tutorialShadow.innerHTML = html;
+
+    // Only Skip button — no Next. Steps advance by real interaction.
+    tutorialShadow.getElementById('tutorial-skip')?.addEventListener('click', () => finishTutorial());
+  }
+
+  // ── Confetti ─────────────────────────────────────────────────────
+  function showConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483647;pointer-events:none;';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    const colors = ['#D4835E', '#C15F3C', '#E09570', '#5B9BD5', '#7BC67E', '#F0C05A', '#E86B6B', '#B57EDC'];
+    const pieces = [];
+    for (let i = 0; i < 80; i++) {
+      pieces.push({
+        x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+        y: canvas.height * 0.45,
+        vx: (Math.random() - 0.5) * 16,
+        vy: -Math.random() * 14 - 4,
+        w: Math.random() * 8 + 4,
+        h: Math.random() * 6 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * Math.PI * 2,
+        rotV: (Math.random() - 0.5) * 0.3,
+        opacity: 1
+      });
+    }
+
+    let frame = 0;
+    const maxFrames = 120;
+
+    function animate() {
+      frame++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of pieces) {
+        p.x += p.vx;
+        p.vy += 0.3; // gravity
+        p.y += p.vy;
+        p.vx *= 0.98;
+        p.rot += p.rotV;
+        if (frame > maxFrames - 30) {
+          p.opacity = Math.max(0, p.opacity - 0.035);
+        }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      if (frame < maxFrames) {
+        requestAnimationFrame(animate);
+      } else {
+        canvas.remove();
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
   // ── Init ──────────────────────────────────────────────────────────
   async function init() {
     // Restore collapsed state
@@ -852,6 +1215,25 @@
 
     // Observe body for SPA navigation
     navObserver.observe(document.body, { childList: true, subtree: false });
+
+    // Check if tutorial should be shown (after a delay to ensure sidebar toggle exists)
+    if (await shouldShowTutorial()) {
+      setTimeout(() => {
+        if (document.getElementById(SIDEBAR_TOGGLE_ID)) {
+          startTutorial();
+        } else {
+          // Wait for sidebar toggle to appear
+          const waitForToggle = setInterval(() => {
+            if (document.getElementById(SIDEBAR_TOGGLE_ID)) {
+              clearInterval(waitForToggle);
+              startTutorial();
+            }
+          }, 500);
+          // Give up after 10s
+          setTimeout(() => clearInterval(waitForToggle), 10000);
+        }
+      }, 1500);
+    }
   }
 
   // Wait for body to be ready

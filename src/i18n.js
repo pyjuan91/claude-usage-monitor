@@ -25,7 +25,19 @@
       resetsInHourMin: 'Resets in {0}h {1}m',
       resets: 'Resets {0}',
       noData: 'No usage data cached. Open claude.ai to fetch data.',
-      claudeUsage: 'Claude Usage'
+      claudeUsage: 'Claude Usage',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: 'Skip',
+      tutorialNext: 'Next',
+      tutorialDone: 'Done',
+      tutorialStep1Title: 'Open Usage Widget',
+      tutorialStep1Desc: 'Click this button in the sidebar to toggle the usage monitor widget.',
+      tutorialStep2Title: 'Drag to Reposition',
+      tutorialStep2Desc: 'Grab the handle at the top and drag up or down to move the widget.',
+      tutorialStep3Title: 'Collapse Widget',
+      tutorialStep3Desc: 'Click this arrow to collapse the widget and save screen space.',
+      tutorialStep4Title: 'Toggle Anytime',
+      tutorialStep4Desc: 'Use this sidebar button anytime to show or hide the widget.'
     },
     fr: {
       loading: 'Chargement des donn\u00e9es...',
@@ -48,7 +60,19 @@
       resetsInHourMin: 'R\u00e9init. dans {0}h {1}m',
       resets: 'R\u00e9init. {0}',
       noData: 'Aucune donn\u00e9e en cache. Ouvrez claude.ai.',
-      claudeUsage: 'Utilisation Claude'
+      claudeUsage: 'Utilisation Claude',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: 'Passer',
+      tutorialNext: 'Suivant',
+      tutorialDone: 'Termin\u00e9',
+      tutorialStep1Title: 'Ouvrir le widget',
+      tutorialStep1Desc: 'Cliquez sur ce bouton dans la barre lat\u00e9rale pour afficher le moniteur.',
+      tutorialStep2Title: 'D\u00e9placer le widget',
+      tutorialStep2Desc: 'Saisissez la poign\u00e9e en haut et faites glisser vers le haut ou le bas.',
+      tutorialStep3Title: 'R\u00e9duire le widget',
+      tutorialStep3Desc: 'Cliquez sur cette fl\u00e8che pour r\u00e9duire le widget.',
+      tutorialStep4Title: 'Basculer \u00e0 tout moment',
+      tutorialStep4Desc: 'Utilisez ce bouton pour afficher ou masquer le widget.'
     },
     de: {
       loading: 'Nutzungsdaten werden geladen...',
@@ -71,7 +95,19 @@
       resetsInHourMin: 'Reset in {0}h {1}m',
       resets: 'Reset {0}',
       noData: 'Keine Daten im Cache. \u00d6ffnen Sie claude.ai.',
-      claudeUsage: 'Claude-Nutzung'
+      claudeUsage: 'Claude-Nutzung',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: '\u00dcberspringen',
+      tutorialNext: 'Weiter',
+      tutorialDone: 'Fertig',
+      tutorialStep1Title: 'Widget \u00f6ffnen',
+      tutorialStep1Desc: 'Klicken Sie auf diese Schaltfl\u00e4che in der Seitenleiste, um den Monitor anzuzeigen.',
+      tutorialStep2Title: 'Widget verschieben',
+      tutorialStep2Desc: 'Greifen Sie den Griff oben und ziehen Sie nach oben oder unten.',
+      tutorialStep3Title: 'Widget einklappen',
+      tutorialStep3Desc: 'Klicken Sie auf diesen Pfeil, um das Widget einzuklappen.',
+      tutorialStep4Title: 'Jederzeit umschalten',
+      tutorialStep4Desc: 'Verwenden Sie diese Schaltfl\u00e4che, um das Widget ein- oder auszublenden.'
     },
     hi: {
       loading: '\u0909\u092a\u092f\u094b\u0917 \u0921\u0947\u091f\u093e \u0932\u094b\u0921 \u0939\u094b \u0930\u0939\u093e \u0939\u0948...',
@@ -94,7 +130,19 @@
       resetsInHourMin: '{0}\u0918\u0902 {1}\u092e\u093f\u0928 \u092e\u0947\u0902 \u0930\u0940\u0938\u0947\u091f',
       resets: '\u0930\u0940\u0938\u0947\u091f {0}',
       noData: '\u0915\u094b\u0908 \u0915\u0948\u0936 \u0921\u0947\u091f\u093e \u0928\u0939\u0940\u0902\u0964 claude.ai \u0916\u094b\u0932\u0947\u0902\u0964',
-      claudeUsage: 'Claude \u0909\u092a\u092f\u094b\u0917'
+      claudeUsage: 'Claude \u0909\u092a\u092f\u094b\u0917',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: '\u091b\u094b\u0921\u093c\u0947\u0902',
+      tutorialNext: '\u0905\u0917\u0932\u093e',
+      tutorialDone: '\u0939\u094b \u0917\u092f\u093e',
+      tutorialStep1Title: '\u0935\u093f\u091c\u0947\u091f \u0916\u094b\u0932\u0947\u0902',
+      tutorialStep1Desc: '\u092e\u0949\u0928\u093f\u091f\u0930 \u0926\u093f\u0916\u093e\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0938\u093e\u0907\u0921\u092c\u093e\u0930 \u092e\u0947\u0902 \u0907\u0938 \u092c\u091f\u0928 \u092a\u0930 \u0915\u094d\u0932\u093f\u0915 \u0915\u0930\u0947\u0902\u0964',
+      tutorialStep2Title: '\u0916\u0940\u0902\u091a\u0947\u0902 \u0914\u0930 \u0930\u0916\u0947\u0902',
+      tutorialStep2Desc: '\u0935\u093f\u091c\u0947\u091f \u0915\u094b \u090a\u092a\u0930 \u092f\u093e \u0928\u0940\u091a\u0947 \u0932\u0947 \u091c\u093e\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0939\u0948\u0902\u0921\u0932 \u0916\u0940\u0902\u091a\u0947\u0902\u0964',
+      tutorialStep3Title: '\u0935\u093f\u091c\u0947\u091f \u091b\u094b\u091f\u093e \u0915\u0930\u0947\u0902',
+      tutorialStep3Desc: '\u0935\u093f\u091c\u0947\u091f \u0915\u094b \u091b\u094b\u091f\u093e \u0915\u0930\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0907\u0938 \u0924\u0940\u0930 \u092a\u0930 \u0915\u094d\u0932\u093f\u0915 \u0915\u0930\u0947\u0902\u0964',
+      tutorialStep4Title: '\u0915\u092d\u0940 \u092d\u0940 \u091f\u0949\u0917\u0932 \u0915\u0930\u0947\u0902',
+      tutorialStep4Desc: '\u0935\u093f\u091c\u0947\u091f \u0926\u093f\u0916\u093e\u0928\u0947 \u092f\u093e \u091b\u0941\u092a\u093e\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0907\u0938 \u092c\u091f\u0928 \u0915\u093e \u0909\u092a\u092f\u094b\u0917 \u0915\u0930\u0947\u0902\u0964'
     },
     id: {
       loading: 'Memuat data penggunaan...',
@@ -117,7 +165,19 @@
       resetsInHourMin: 'Reset dalam {0}j {1}m',
       resets: 'Reset {0}',
       noData: 'Tidak ada data cache. Buka claude.ai.',
-      claudeUsage: 'Penggunaan Claude'
+      claudeUsage: 'Penggunaan Claude',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: 'Lewati',
+      tutorialNext: 'Lanjut',
+      tutorialDone: 'Selesai',
+      tutorialStep1Title: 'Buka Widget',
+      tutorialStep1Desc: 'Klik tombol ini di sidebar untuk menampilkan monitor penggunaan.',
+      tutorialStep2Title: 'Geser untuk Memindahkan',
+      tutorialStep2Desc: 'Tarik pegangan di atas untuk menggeser widget ke atas atau bawah.',
+      tutorialStep3Title: 'Ciutkan Widget',
+      tutorialStep3Desc: 'Klik panah ini untuk menciutkan widget.',
+      tutorialStep4Title: 'Beralih Kapan Saja',
+      tutorialStep4Desc: 'Gunakan tombol sidebar ini untuk menampilkan atau menyembunyikan widget.'
     },
     it: {
       loading: 'Caricamento dati di utilizzo...',
@@ -140,7 +200,19 @@
       resetsInHourMin: 'Reset tra {0}h {1}m',
       resets: 'Reset {0}',
       noData: 'Nessun dato in cache. Apri claude.ai.',
-      claudeUsage: 'Utilizzo Claude'
+      claudeUsage: 'Utilizzo Claude',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: 'Salta',
+      tutorialNext: 'Avanti',
+      tutorialDone: 'Fatto',
+      tutorialStep1Title: 'Apri il widget',
+      tutorialStep1Desc: 'Clicca questo pulsante nella barra laterale per mostrare il monitor.',
+      tutorialStep2Title: 'Trascina per spostare',
+      tutorialStep2Desc: 'Afferra la maniglia in alto e trascina su o gi\u00f9 per spostare il widget.',
+      tutorialStep3Title: 'Comprimi il widget',
+      tutorialStep3Desc: 'Clicca questa freccia per comprimere il widget.',
+      tutorialStep4Title: 'Attiva in qualsiasi momento',
+      tutorialStep4Desc: 'Usa questo pulsante per mostrare o nascondere il widget.'
     },
     ja: {
       loading: '\u4f7f\u7528\u30c7\u30fc\u30bf\u3092\u8aad\u307f\u8fbc\u307f\u4e2d...',
@@ -163,7 +235,19 @@
       resetsInHourMin: '{0}\u6642\u9593{1}\u5206\u5f8c\u306b\u30ea\u30bb\u30c3\u30c8',
       resets: '{0}\u306b\u30ea\u30bb\u30c3\u30c8',
       noData: '\u30ad\u30e3\u30c3\u30b7\u30e5\u30c7\u30fc\u30bf\u306a\u3057\u3002claude.ai\u3092\u958b\u3044\u3066\u304f\u3060\u3055\u3044\u3002',
-      claudeUsage: 'Claude \u4f7f\u7528\u91cf'
+      claudeUsage: 'Claude \u4f7f\u7528\u91cf',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: '\u30b9\u30ad\u30c3\u30d7',
+      tutorialNext: '\u6b21\u3078',
+      tutorialDone: '\u5b8c\u4e86',
+      tutorialStep1Title: '\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u3092\u958b\u304f',
+      tutorialStep1Desc: '\u30b5\u30a4\u30c9\u30d0\u30fc\u306e\u3053\u306e\u30dc\u30bf\u30f3\u3092\u30af\u30ea\u30c3\u30af\u3057\u3066\u30e2\u30cb\u30bf\u30fc\u3092\u8868\u793a\u3057\u307e\u3059\u3002',
+      tutorialStep2Title: '\u30c9\u30e9\u30c3\u30b0\u3067\u79fb\u52d5',
+      tutorialStep2Desc: '\u4e0a\u306e\u30cf\u30f3\u30c9\u30eb\u3092\u3064\u304b\u3093\u3067\u4e0a\u4e0b\u306b\u30c9\u30e9\u30c3\u30b0\u3057\u3066\u79fb\u52d5\u3057\u307e\u3059\u3002',
+      tutorialStep3Title: '\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u3092\u6298\u308a\u305f\u305f\u3080',
+      tutorialStep3Desc: '\u3053\u306e\u77e2\u5370\u3092\u30af\u30ea\u30c3\u30af\u3057\u3066\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u3092\u6298\u308a\u305f\u305f\u307f\u307e\u3059\u3002',
+      tutorialStep4Title: '\u3044\u3064\u3067\u3082\u5207\u308a\u66ff\u3048',
+      tutorialStep4Desc: '\u3053\u306e\u30dc\u30bf\u30f3\u3067\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u306e\u8868\u793a\u30fb\u975e\u8868\u793a\u3092\u5207\u308a\u66ff\u3048\u307e\u3059\u3002'
     },
     ko: {
       loading: '\uc0ac\uc6a9\ub7c9 \ub370\uc774\ud130 \ub85c\ub529 \uc911...',
@@ -186,7 +270,19 @@
       resetsInHourMin: '{0}\uc2dc\uac04 {1}\ubd84 \ud6c4 \ub9ac\uc14b',
       resets: '{0}\uc5d0 \ub9ac\uc14b',
       noData: '\uce90\uc2dc \ub370\uc774\ud130 \uc5c6\uc74c. claude.ai\ub97c \uc5ec\uc138\uc694.',
-      claudeUsage: 'Claude \uc0ac\uc6a9\ub7c9'
+      claudeUsage: 'Claude \uc0ac\uc6a9\ub7c9',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: '\uac74\ub108\ub6f0\uae30',
+      tutorialNext: '\ub2e4\uc74c',
+      tutorialDone: '\uc644\ub8cc',
+      tutorialStep1Title: '\uc704\uc82f \uc5f4\uae30',
+      tutorialStep1Desc: '\uc0ac\uc774\ub4dc\ubc14\uc758 \uc774 \ubc84\ud2bc\uc744 \ud074\ub9ad\ud558\uc5ec \ubaa8\ub2c8\ud130\ub97c \ud45c\uc2dc\ud569\ub2c8\ub2e4.',
+      tutorialStep2Title: '\ub4dc\ub798\uadf8\ud558\uc5ec \uc774\ub3d9',
+      tutorialStep2Desc: '\uc704\ucabd \ud578\ub4e4\uc744 \uc7a1\uace0 \uc704\uc544\ub798\ub85c \ub4dc\ub798\uadf8\ud558\uc5ec \uc774\ub3d9\ud569\ub2c8\ub2e4.',
+      tutorialStep3Title: '\uc704\uc82f \uc811\uae30',
+      tutorialStep3Desc: '\uc774 \ud654\uc0b4\ud45c\ub97c \ud074\ub9ad\ud558\uc5ec \uc704\uc82f\uc744 \uc811\uc2b5\ub2c8\ub2e4.',
+      tutorialStep4Title: '\uc5b8\uc81c\ub4e0\uc9c0 \uc804\ud658',
+      tutorialStep4Desc: '\uc774 \ubc84\ud2bc\uc73c\ub85c \uc704\uc82f\uc744 \ud45c\uc2dc\ud558\uac70\ub098 \uc228\uae38 \uc218 \uc788\uc2b5\ub2c8\ub2e4.'
     },
     pt: {
       loading: 'Carregando dados de uso...',
@@ -209,7 +305,19 @@
       resetsInHourMin: 'Reinicia em {0}h {1}m',
       resets: 'Reinicia {0}',
       noData: 'Sem dados em cache. Abra claude.ai.',
-      claudeUsage: 'Uso do Claude'
+      claudeUsage: 'Uso do Claude',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: 'Pular',
+      tutorialNext: 'Pr\u00f3ximo',
+      tutorialDone: 'Conclu\u00eddo',
+      tutorialStep1Title: 'Abrir o widget',
+      tutorialStep1Desc: 'Clique neste bot\u00e3o na barra lateral para exibir o monitor.',
+      tutorialStep2Title: 'Arraste para mover',
+      tutorialStep2Desc: 'Segure a al\u00e7a no topo e arraste para cima ou para baixo.',
+      tutorialStep3Title: 'Recolher o widget',
+      tutorialStep3Desc: 'Clique nesta seta para recolher o widget.',
+      tutorialStep4Title: 'Alternar a qualquer momento',
+      tutorialStep4Desc: 'Use este bot\u00e3o para mostrar ou ocultar o widget.'
     },
     es: {
       loading: 'Cargando datos de uso...',
@@ -232,7 +340,19 @@
       resetsInHourMin: 'Reinicio en {0}h {1}m',
       resets: 'Reinicio {0}',
       noData: 'Sin datos en cach\u00e9. Abre claude.ai.',
-      claudeUsage: 'Uso de Claude'
+      claudeUsage: 'Uso de Claude',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: 'Omitir',
+      tutorialNext: 'Siguiente',
+      tutorialDone: 'Listo',
+      tutorialStep1Title: 'Abrir el widget',
+      tutorialStep1Desc: 'Haz clic en este bot\u00f3n de la barra lateral para mostrar el monitor.',
+      tutorialStep2Title: 'Arrastra para mover',
+      tutorialStep2Desc: 'Agarra el asa superior y arrastra hacia arriba o abajo.',
+      tutorialStep3Title: 'Contraer el widget',
+      tutorialStep3Desc: 'Haz clic en esta flecha para contraer el widget.',
+      tutorialStep4Title: 'Alternar en cualquier momento',
+      tutorialStep4Desc: 'Usa este bot\u00f3n para mostrar u ocultar el widget.'
     },
     'zh-Hant': {
       loading: '\u6b63\u5728\u8f09\u5165\u4f7f\u7528\u8cc7\u6599...',
@@ -255,7 +375,19 @@
       resetsInHourMin: '{0}\u5c0f\u6642{1}\u5206\u5f8c\u91cd\u7f6e',
       resets: '{0}\u91cd\u7f6e',
       noData: '\u7121\u5feb\u53d6\u8cc7\u6599\u3002\u8acb\u958b\u555f claude.ai\u3002',
-      claudeUsage: 'Claude \u7528\u91cf'
+      claudeUsage: 'Claude \u7528\u91cf',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: '\u8df3\u904e',
+      tutorialNext: '\u4e0b\u4e00\u6b65',
+      tutorialDone: '\u5b8c\u6210',
+      tutorialStep1Title: '\u958b\u555f\u7528\u91cf\u5c0f\u5de5\u5177',
+      tutorialStep1Desc: '\u9ede\u64ca\u5074\u908a\u6b04\u7684\u9019\u500b\u6309\u9215\u4f86\u986f\u793a\u7528\u91cf\u76e3\u63a7\u5de5\u5177\u3002',
+      tutorialStep2Title: '\u62d6\u66f3\u8abf\u6574\u4f4d\u7f6e',
+      tutorialStep2Desc: '\u6293\u4f4f\u9802\u90e8\u7684\u628a\u624b\uff0c\u4e0a\u4e0b\u62d6\u66f3\u4f86\u79fb\u52d5\u5de5\u5177\u3002',
+      tutorialStep3Title: '\u6536\u5408\u5de5\u5177',
+      tutorialStep3Desc: '\u9ede\u64ca\u9019\u500b\u7bad\u982d\u5c07\u5de5\u5177\u6536\u5408\uff0c\u7bc0\u7701\u87a2\u5e55\u7a7a\u9593\u3002',
+      tutorialStep4Title: '\u96a8\u6642\u5207\u63db',
+      tutorialStep4Desc: '\u4f7f\u7528\u5074\u908a\u6b04\u6309\u9215\u96a8\u6642\u986f\u793a\u6216\u96b1\u85cf\u5de5\u5177\u3002'
     },
     'zh-Hans': {
       loading: '\u6b63\u5728\u52a0\u8f7d\u4f7f\u7528\u6570\u636e...',
@@ -278,7 +410,19 @@
       resetsInHourMin: '{0}\u5c0f\u65f6{1}\u5206\u949f\u540e\u91cd\u7f6e',
       resets: '{0}\u91cd\u7f6e',
       noData: '\u65e0\u7f13\u5b58\u6570\u636e\u3002\u8bf7\u6253\u5f00 claude.ai\u3002',
-      claudeUsage: 'Claude \u7528\u91cf'
+      claudeUsage: 'Claude \u7528\u91cf',
+      tutorialStep: '{0} / {1}',
+      tutorialSkip: '\u8df3\u8fc7',
+      tutorialNext: '\u4e0b\u4e00\u6b65',
+      tutorialDone: '\u5b8c\u6210',
+      tutorialStep1Title: '\u6253\u5f00\u7528\u91cf\u5c0f\u5de5\u5177',
+      tutorialStep1Desc: '\u70b9\u51fb\u4fa7\u8fb9\u680f\u7684\u8fd9\u4e2a\u6309\u94ae\u6765\u663e\u793a\u7528\u91cf\u76d1\u63a7\u5de5\u5177\u3002',
+      tutorialStep2Title: '\u62d6\u62fd\u8c03\u6574\u4f4d\u7f6e',
+      tutorialStep2Desc: '\u6293\u4f4f\u9876\u90e8\u7684\u628a\u624b\uff0c\u4e0a\u4e0b\u62d6\u62fd\u6765\u79fb\u52a8\u5de5\u5177\u3002',
+      tutorialStep3Title: '\u6536\u8d77\u5de5\u5177',
+      tutorialStep3Desc: '\u70b9\u51fb\u8fd9\u4e2a\u7bad\u5934\u5c06\u5de5\u5177\u6536\u8d77\uff0c\u8282\u7701\u5c4f\u5e55\u7a7a\u95f4\u3002',
+      tutorialStep4Title: '\u968f\u65f6\u5207\u6362',
+      tutorialStep4Desc: '\u4f7f\u7528\u4fa7\u8fb9\u680f\u6309\u94ae\u968f\u65f6\u663e\u793a\u6216\u9690\u85cf\u5de5\u5177\u3002'
     }
   };
 
