@@ -22,7 +22,7 @@ jobs:
         run: python3 -m json.tool src/manifest.json > /dev/null
       - name: Check all referenced files exist
         run: |
-          for f in src/utils.js src/content.js src/popup.js src/background.js src/browser-polyfill.js src/styles.css src/popup.html; do
+          for f in src/i18n.js src/utils.js src/content.js src/popup.js src/background.js src/browser-polyfill.js src/styles.css src/popup.html; do
             if [ ! -f "$f" ]; then
               echo "Missing file: $f"
               exit 1

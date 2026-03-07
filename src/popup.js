@@ -1,6 +1,14 @@
 /* popup.js — Fallback popup for viewing usage data */
 
 const STORAGE_KEY_USAGE = 'claude_usage_data';
+const STORAGE_KEY_LANG = 'claude_usage_lang';
+
+// Detect language from stored preference or browser default
+chrome.storage.local.get(STORAGE_KEY_LANG, (result) => {
+  const lang = result[STORAGE_KEY_LANG] || UsageI18n.detectLang(navigator.language);
+  UsageI18n.setLang(lang);
+  document.getElementById('title-text').textContent = UsageI18n.t('claudeUsage');
+});
 
 function getUtilColor(pct) {
   const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -28,7 +36,7 @@ function render(cached) {
   const footer = document.getElementById('footer');
 
   if (!cached || !cached.data) {
-    el.innerHTML = '<div class="error-msg">No usage data cached. Open claude.ai to fetch data.</div>';
+    el.innerHTML = '<div class="error-msg">' + UsageI18n.t('noData') + '</div>';
     return;
   }
 
@@ -36,16 +44,16 @@ function render(cached) {
   let html = '';
 
   if (data.five_hour) {
-    html += buildBar('5-hour', data.five_hour.utilization ?? 0, data.five_hour.resets_at);
+    html += buildBar(UsageI18n.t('hour5'), data.five_hour.utilization ?? 0, data.five_hour.resets_at);
   }
   if (data.seven_day) {
-    html += buildBar('7-day', data.seven_day.utilization ?? 0, data.seven_day.resets_at);
+    html += buildBar(UsageI18n.t('day7'), data.seven_day.utilization ?? 0, data.seven_day.resets_at);
   }
 
   const breakdowns = [
-    { key: 'seven_day_opus', label: 'Opus 7d' },
-    { key: 'seven_day_sonnet', label: 'Sonnet 7d' },
-    { key: 'seven_day_cowork', label: 'Cowork 7d' }
+    { key: 'seven_day_opus', label: UsageI18n.t('opus7d') },
+    { key: 'seven_day_sonnet', label: UsageI18n.t('sonnet7d') },
+    { key: 'seven_day_cowork', label: UsageI18n.t('cowork7d') }
   ];
   for (const bd of breakdowns) {
     if (data[bd.key]?.utilization != null) {
@@ -57,7 +65,7 @@ function render(cached) {
     const used = (data.extra_usage.used_credits ?? 0).toFixed(2);
     const limit = (data.extra_usage.monthly_limit ?? 0).toFixed(2);
     html += `<div class="row">
-      <div class="row-label">Extra usage</div>
+      <div class="row-label">${UsageI18n.t('extraUsage')}</div>
       <div class="extra-text">$${used} / $${limit}</div>
     </div>`;
   }
@@ -66,7 +74,7 @@ function render(cached) {
 
   if (cached.timestamp) {
     const mins = Math.floor((Date.now() - cached.timestamp) / 60_000);
-    footer.textContent = mins < 1 ? 'Updated just now' : `Updated ${mins}m ago`;
+    footer.textContent = mins < 1 ? UsageI18n.t('updatedNow') : UsageI18n.t('updatedAgo', mins);
   }
 }
 

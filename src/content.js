@@ -11,6 +11,16 @@
   const NOTIFICATION_KEY = 'claude_usage_notified_80';
   const PREFIX = 'claude-usage';
 
+  // ── i18n setup ───────────────────────────────────────────────────
+  const STORAGE_KEY_LANG = 'claude_usage_lang';
+
+  function detectAndSetLang() {
+    var lang = UsageI18n.detectLang();
+    UsageI18n.setLang(lang);
+    storage.set(STORAGE_KEY_LANG, lang);
+  }
+  detectAndSetLang();
+
   // ── Storage helper (works with both chrome and browser APIs) ──────
   const storage = {
     async get(key) {
@@ -169,7 +179,7 @@
           storage.set(NOTIFICATION_KEY, true);
           chrome.runtime.sendMessage({
             type: 'USAGE_THRESHOLD',
-            message: `5-hour usage at ${data.five_hour.utilization.toFixed(0)}%. Consider slowing down.`
+            message: UsageI18n.t('thresholdWarning', data.five_hour.utilization.toFixed(0))
           }).catch(() => {});
         }
       });
@@ -187,8 +197,8 @@
   function formatLastUpdated() {
     if (!lastFetchTime) return '';
     const diff = Math.floor((Date.now() - lastFetchTime) / 60_000);
-    if (diff < 1) return 'Updated just now';
-    return `Updated ${diff}m ago`;
+    if (diff < 1) return UsageI18n.t('updatedNow');
+    return UsageI18n.t('updatedAgo', diff);
   }
 
   // ── Theme detection ───────────────────────────────────────────────
@@ -407,7 +417,7 @@
 
     if (!data && !fetchError) {
       // Loading
-      html += `<div class="loading-state"><span class="spinner"></span> Loading usage data...</div>`;
+      html += `<div class="loading-state"><span class="spinner"></span> ${UsageI18n.t('loading')}</div>`;
     } else if (fetchError && !data) {
       // Error with no data
       html += `<div class="error-msg">${getErrorMessage()}</div>`;
@@ -418,7 +428,7 @@
     // Footer
     html += `<div class="footer">
       <span class="footer-text">${formatLastUpdated()}</span>
-      <button class="collapse-btn" id="btn-collapse" title="Collapse">
+      <button class="collapse-btn" id="btn-collapse" title="${UsageI18n.t('collapse')}">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -452,7 +462,7 @@
       html += `<div class="row">
         <div class="row-label">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="${textSecondary}"><path d="M8 1a7 7 0 110 14A7 7 0 018 1zm0 1.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM8 3.75a.75.75 0 01.75.75v3.19l2.03 2.03a.75.75 0 01-1.06 1.06l-2.22-2.22a.75.75 0 01-.25-.56V4.5A.75.75 0 018 3.75z"/></svg>
-          5-hour
+          ${UsageI18n.t('hour5')}
         </div>
         <div class="bar-container">
           <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
@@ -469,7 +479,7 @@
       html += `<div class="row">
         <div class="row-label">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="${textSecondary}"><path d="M2.5 2A1.5 1.5 0 001 3.5v10A1.5 1.5 0 002.5 15h11a1.5 1.5 0 001.5-1.5v-10A1.5 1.5 0 0013.5 2h-1V.75a.75.75 0 00-1.5 0V2h-6V.75a.75.75 0 00-1.5 0V2h-1zM2.5 6h11v7.5h-11V6z"/></svg>
-          7-day
+          ${UsageI18n.t('day7')}
         </div>
         <div class="bar-container">
           <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
@@ -481,9 +491,9 @@
 
     // Opus / Sonnet / Cowork breakdowns
     const breakdowns = [
-      { key: 'seven_day_opus', label: 'Opus 7d' },
-      { key: 'seven_day_sonnet', label: 'Sonnet 7d' },
-      { key: 'seven_day_cowork', label: 'Cowork 7d' }
+      { key: 'seven_day_opus', label: UsageI18n.t('opus7d') },
+      { key: 'seven_day_sonnet', label: UsageI18n.t('sonnet7d') },
+      { key: 'seven_day_cowork', label: UsageI18n.t('cowork7d') }
     ];
     for (const bd of breakdowns) {
       if (data[bd.key] && data[bd.key].utilization != null) {
@@ -507,7 +517,7 @@
       html += `<div class="row">
         <div class="row-label">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="${textSecondary}"><path d="M8 1.5a6.5 6.5 0 110 13 6.5 6.5 0 010-13zM8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.75a.75.75 0 00-1.5 0v3a.75.75 0 00.22.53l2 2a.75.75 0 101.06-1.06L8.5 7.44V4.75z"/></svg>
-          Extra usage
+          ${UsageI18n.t('extraUsage')}
         </div>
         <div class="extra-text">$${used} / $${limit}</div>
       </div>`;
@@ -559,7 +569,7 @@
     if (!btn) {
       btn = document.createElement('button');
       btn.id = SIDEBAR_TOGGLE_ID;
-      btn.title = 'Usage Monitor';
+      btn.title = UsageI18n.t('usageMonitor');
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -615,24 +625,27 @@
   function getErrorMessage() {
     switch (fetchError) {
       case 'auth':
-        return 'Please log in to claude.ai';
+        return UsageI18n.t('loginRequired');
       case 'org_not_found':
-        return 'Unable to detect organization. Please refresh the page.';
+        return UsageI18n.t('orgNotFound');
       case 'network':
         return lastUsageData
-          ? `Usage data unavailable. ${formatLastUpdated()}`
-          : 'Usage data unavailable';
+          ? `${UsageI18n.t('unavailable')}. ${formatLastUpdated()}`
+          : UsageI18n.t('unavailable');
       default:
-        return 'Loading...';
+        return UsageI18n.t('loading');
     }
   }
 
   // ── Theme observer ────────────────────────────────────────────────
   function observeTheme() {
-    const observer = new MutationObserver(() => scheduleRender());
+    const observer = new MutationObserver(() => {
+      detectAndSetLang();
+      scheduleRender();
+    });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class', 'data-theme']
+      attributeFilter: ['class', 'data-theme', 'lang']
     });
     if (document.body) {
       observer.observe(document.body, {

@@ -22,23 +22,28 @@
     const resetTime = new Date(isoStr).getTime();
     if (now === undefined) now = Date.now();
     const diff = resetTime - now;
-    if (diff <= 0) return 'Resetting soon';
+
+    var i18n = typeof UsageI18n !== 'undefined' ? UsageI18n : null;
+    var t = i18n ? function () { return i18n.t.apply(i18n, arguments); } : null;
+
+    if (diff <= 0) return t ? t('resettingSoon') : 'Resetting soon';
 
     const hours = Math.floor(diff / 3_600_000);
     const mins = Math.floor((diff % 3_600_000) / 60_000);
 
     if (hours >= 24) {
       const date = new Date(isoStr);
-      var day = date.toLocaleDateString('en-US', { weekday: 'short' });
-      var time = date.toLocaleTimeString('en-US', {
+      var dateLocale = i18n ? i18n.getDateLocale() : 'en-US';
+      var day = date.toLocaleDateString(dateLocale, { weekday: 'short' });
+      var time = date.toLocaleTimeString(dateLocale, {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true
       });
-      return 'Resets ' + day + ' ' + time;
+      return t ? t('resets', day + ' ' + time) : 'Resets ' + day + ' ' + time;
     }
-    if (hours > 0) return 'Resets in ' + hours + 'h ' + mins + 'm';
-    return 'Resets in ' + mins + 'm';
+    if (hours > 0) return t ? t('resetsInHourMin', hours, mins) : 'Resets in ' + hours + 'h ' + mins + 'm';
+    return t ? t('resetsInMin', mins) : 'Resets in ' + mins + 'm';
   };
 
   /**
