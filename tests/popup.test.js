@@ -8,7 +8,7 @@ describe('popup utility functions (via utils)', () => {
     });
 
     it('returns correct color for light mode low usage', () => {
-      expect(utils.getUtilColor(20, false)).toBe('#C15F3C');
+      expect(utils.getUtilColor(20, false)).toBe('#A8896C');
     });
   });
 });
@@ -38,8 +38,8 @@ describe('buildBar HTML output', () => {
     expect(html).toContain('width:65%');
   });
 
-  it('uses yellow color for mid-range utilization', () => {
-    const html = buildBar('7-day', 60, null);
+  it('uses amber color for mid-range utilization', () => {
+    const html = buildBar('7-day', 70, null);
     expect(html).toContain('#D4940A');
   });
 

@@ -8,8 +8,9 @@
    */
   exports.getUtilColor = function (pct, dark) {
     if (pct > 80) return dark ? '#E5524A' : '#D03E3E';
-    if (pct > 50) return dark ? '#E0A020' : '#D4940A';
-    return dark ? '#D4835E' : '#C15F3C';
+    if (pct > 60) return dark ? '#E0A020' : '#D4940A';
+    if (pct > 30) return dark ? '#D4835E' : '#C15F3C';
+    return dark ? '#C4A882' : '#A8896C';
   };
 
   /**

@@ -2,19 +2,27 @@ import { describe, it, expect } from 'vitest';
 const utils = require('../src/utils.js');
 
 describe('getUtilColor', () => {
-  it('returns green/orange for <=50% (dark)', () => {
-    expect(utils.getUtilColor(30, true)).toBe('#D4835E');
+  it('returns sand for <=30% (dark)', () => {
+    expect(utils.getUtilColor(20, true)).toBe('#C4A882');
   });
 
-  it('returns green/orange for <=50% (light)', () => {
-    expect(utils.getUtilColor(50, false)).toBe('#C15F3C');
+  it('returns sand for <=30% (light)', () => {
+    expect(utils.getUtilColor(30, false)).toBe('#A8896C');
   });
 
-  it('returns yellow for 50-80% (dark)', () => {
-    expect(utils.getUtilColor(51, true)).toBe('#E0A020');
+  it('returns terracotta for 30-60% (dark)', () => {
+    expect(utils.getUtilColor(31, true)).toBe('#D4835E');
   });
 
-  it('returns yellow for 50-80% (light)', () => {
+  it('returns terracotta for 30-60% (light)', () => {
+    expect(utils.getUtilColor(60, false)).toBe('#C15F3C');
+  });
+
+  it('returns amber for 60-80% (dark)', () => {
+    expect(utils.getUtilColor(61, true)).toBe('#E0A020');
+  });
+
+  it('returns amber for 60-80% (light)', () => {
     expect(utils.getUtilColor(80, false)).toBe('#D4940A');
   });
 
@@ -26,8 +34,8 @@ describe('getUtilColor', () => {
     expect(utils.getUtilColor(100, false)).toBe('#D03E3E');
   });
 
-  it('returns base color at 0%', () => {
-    expect(utils.getUtilColor(0, true)).toBe('#D4835E');
+  it('returns sand at 0%', () => {
+    expect(utils.getUtilColor(0, true)).toBe('#C4A882');
   });
 });
 
